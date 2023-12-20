@@ -55,4 +55,4 @@ This project was inspired by the need for a robust and efficient way to manage s
 
 ---
 
-Thank you for choosing the C++ Package Dependency System (PDS) for your software development needs. We hope this tool enhances your project's maintainability and efficiency.
+Thank you for choosing the C++ Package Dependency System (PDS) for your software development needs. I hope this tool enhances your project's maintainability and efficiency.
