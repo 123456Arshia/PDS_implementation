@@ -32,11 +32,9 @@ string simpleHash(const string& password) {
     return ss.str();
 }
 struct SystemData {
-    // Example fields
     double cpuUsage;
     double memoryUsage;
     long requestCount;
-    // ... other relevant fields
 
     // Convert data to a CSV string
     string toString() const {
@@ -48,7 +46,6 @@ struct SystemData {
 void collectAndSaveData() {
     // Collect data
     SystemData data;
-    // TODO: Fill data with actual metrics (e.g., CPU usage, memory usage, etc.)
 
     // Save data to a file
     std::ofstream file("system_data.csv", std::ios::app); // Append mode
@@ -245,8 +242,7 @@ public:
               string role = users[username].role;
 
               // Check if the role has the required permission for the action
-              // Here, you might need to map the action and component to specific permissions
-              string requiredPermission = component + "_" + action; // Example format: "ComponentName_action"
+              string requiredPermission = component + "_" + action; 
               return roles[role].permissions.find(requiredPermission) != roles[role].permissions.end();
           }
         
@@ -458,7 +454,6 @@ public:
        }
 };
 
-// Ensure `AuditLog` is used in relevant parts of your code, such as in `SecurityManager` methods
 
 
 class SecureCommunicator {
@@ -905,8 +900,8 @@ public:
     }
     
     void automateServiceUpdates() {
-        unordered_map<string, int> latestVersions; // Assume this map is filled with the latest versions of services
-
+        unordered_map<string, int> latestVersions; 
+        
         // Iterate through each component and update its services to the latest versions
         for (auto& pair : components) {
             for (auto& service : pair.second.exports) {
