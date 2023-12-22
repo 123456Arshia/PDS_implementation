@@ -24,7 +24,6 @@
 using namespace std;
 
 string simpleHash(const string& password) {
-    // A simple hash function for demonstration. Do not use in production!
     hash<string> hasher;
     auto hashed = hasher(password);
     stringstream ss;
@@ -36,10 +35,9 @@ struct SystemData {
     double memoryUsage;
     long requestCount;
 
-    // Convert data to a CSV string
     string toString() const {
         stringstream ss;
-        ss << cpuUsage << "," << memoryUsage << "," << requestCount; // Add other fields as needed
+        ss << cpuUsage << "," << memoryUsage << "," << requestCount; 
         return ss.str();
     }
 };
@@ -80,7 +78,7 @@ public:
         : username(username), password(password), role(role) {}
 };
 
-class Service; // Forward declaration
+class Service; 
 
 class ServiceDiscovery {
 public:
@@ -91,16 +89,14 @@ class SecurityManager {
 private:
     unordered_map<string, User> users;
     unordered_map<string, Role> roles;
-    unordered_map<string, string> pendingUsers; // Users awaiting admin approval
+    unordered_map<string, string> pendingUsers; 
     
     string serialize() {
             stringstream ss;
-            // Serialize users
             for (const auto& [username, user] : users) {
                 ss << username << "," << user.password << "," << user.role << ";";
             }
             ss << endl;
-            // Serialize roles
             for (const auto& [roleName, role] : roles) {
                 ss << roleName << ":";
                 for (const auto& perm : role.permissions) {
@@ -111,14 +107,12 @@ private:
             return ss.str();
         }
 
-        // Deserializes a string to users and roles
         void deserialize(const string& data) {
             stringstream ss(data);
             string usersPart, rolesPart;
             getline(ss, usersPart, '\n');
             getline(ss, rolesPart, '\n');
             
-            // Deserialize users
             stringstream usersStream(usersPart);
             string userEntry;
             while (getline(usersStream, userEntry, ';')) {
@@ -130,7 +124,6 @@ private:
                 users[username] = User(username, password, role);
             }
             
-            // Deserialize roles
             stringstream rolesStream(rolesPart);
             string roleEntry;
             while (getline(rolesStream, roleEntry, ';')) {
@@ -148,13 +141,11 @@ private:
         }
     
     void initializeDefaultData() {
-            // Define default roles and admin user
             roles["admin"] = Role("admin", {"read", "write", "modify", "approveUser", "assignRole"});
             roles["user"] = Role("user", {"read"});
             roles["guest"] = Role("guest", {});
             users["admin"] = User("admin", simpleHash("adminPass"), "admin");
             
-            // Save to file
             saveToFile("security_data.txt");
         }
     
@@ -169,7 +160,6 @@ public:
            return pendingUsernames;
        }
 
-       // Retrieve all roles
        vector<string> getAllRoles() {
            vector<string> roleNames;
            for (const auto& role : roles) {
@@ -178,7 +168,6 @@ public:
            return roleNames;
        }
 
-       // Retrieve a specific user's role
        string getUserRole(const string& username) {
            if (users.find(username) != users.end()) {
                return users[username].role;
@@ -186,7 +175,6 @@ public:
            return "User not found";
        }
 
-       // Retrieve all approved users with their roles
        vector<pair<string, string>> getAllUsersWithRoles() {
            vector<pair<string, string>> userDetails;
            for (const auto& user : users) {
@@ -206,7 +194,6 @@ public:
             }
         }
 
-        // Loads the state from a file
         void loadFromFile(const string& filename) {
             ifstream file(filename);
             if (file.is_open()) {
@@ -221,13 +208,10 @@ public:
         }
     
     SecurityManager() {
-        // Load data from file or initialize default data if the file doesn't exist
                ifstream file("security_data.txt");
                if (file.good()) {
-                   // File exists, load data
                    loadFromFile("security_data.txt");
                } else {
-                   // File doesn't exist, initialize default data
                    initializeDefaultData();
                }
         }
@@ -238,10 +222,8 @@ public:
                   return false; // User does not exist
               }
 
-              // Get the user's role
               string role = users[username].role;
 
-              // Check if the role has the required permission for the action
               string requiredPermission = component + "_" + action; 
               return roles[role].permissions.find(requiredPermission) != roles[role].permissions.end();
           }
@@ -297,7 +279,7 @@ public:
     }
         void approveUser(const string& adminUsername, const string& username) {
             if (isAdmin(adminUsername) && pendingUsers.find(username) != pendingUsers.end()) {
-                users[username] = User(username, pendingUsers[username], "guest"); // Default to "guest" or another role
+                users[username] = User(username, pendingUsers[username], "guest"); 
                 pendingUsers.erase(username);
                 cout << "User " << username << " approved and assigned default role." << endl;
             } else {
@@ -318,7 +300,6 @@ public:
             }
         }
 
-        // Helper method to check if a user is an admin
         bool isAdmin(const string& username) {
             return users.find(username) != users.end() && users[username].role == "admin";
         }
@@ -359,7 +340,6 @@ public:
     bool rollback(int version) {
            if (versionHistory.find(version) != versionHistory.end()) {
                this->version = version;
-               // Additional rollback logic...
                return true;
            }
            return false;
@@ -375,19 +355,14 @@ public:
         vector<shared_ptr<Service>> imports;
         vector<shared_ptr<Service>> exports;
 
-        // Default constructor
         Component() = default;
 
-        // Custom constructor
         Component(const string& name) : name(name) {}
 
-        // Copy constructor
         Component(const Component& other) : name(other.name), imports(other.imports), exports(other.exports) {}
 
-        // Move constructor
     Component(Component&& other) noexcept : name(std::move(other.name)), imports(std::move(other.imports)), exports(std::move(other.exports)) {}
 
-        // Copy assignment operator
         Component& operator=(const Component& other) {
             if (this != &other) {
                 name = other.name;
@@ -397,7 +372,6 @@ public:
             return *this;
         }
 
-        // Move assignment operator
         Component& operator=(Component&& other) noexcept {
             if (this != &other) {
                 name = std::move(other.name);
@@ -436,7 +410,6 @@ public:
 class AuditLog {
 public:
     static void logAction(const string& username, const string& action, const string& details) {
-           // Get the current timestamp
            auto now = std::chrono::system_clock::now();
            auto now_c = std::chrono::system_clock::to_time_t(now);
            std::stringstream ss;
@@ -459,7 +432,6 @@ public:
 class SecureCommunicator {
 public:
     void setupTLS() {
-        // In an actual implementation, this would configure SSL/TLS settings.
         cout << "Setting up TLS (simulated)" << endl;
     }
 
@@ -490,7 +462,6 @@ private:
 
                 const auto& comp = components[componentName];
                 for (const auto& service : comp.imports) {
-                    // Find component exporting this service
                     auto exporter = find_if(components.begin(), components.end(),
                         [&service](const auto& pair) {
                             return find_if(pair.second.exports.begin(), pair.second.exports.end(),
@@ -842,7 +813,6 @@ public:
             }
         }
 
-        // Other health checks like resource usage, service availability, etc., can be included
 
         return true; // System is healthy if all checks pass
     }
@@ -850,10 +820,8 @@ public:
     void simulateSystemChange(const string& serviceName) {
         cout << "Simulating change for Service: " << serviceName << "\n";
 
-        // Count the number of components that will be affected by the change
         int affectedComponentsCount = 0;
 
-        // Check impact on exports
         for (const auto& pair : components) {
             const auto& comp = pair.second;
             auto it = find_if(comp.exports.begin(), comp.exports.end(),
@@ -864,7 +832,6 @@ public:
             }
         }
 
-        // Check impact on imports
         for (const auto& pair : components) {
             const auto& comp = pair.second;
             auto it = find_if(comp.imports.begin(), comp.imports.end(),
@@ -884,14 +851,12 @@ public:
 
     void balanceServiceLoad() {
         unordered_map<string, int> serviceLoad;
-        // Calculate the load (number of imports) for each service
         for (const auto& pair : components) {
             for (const auto& service : pair.second.imports) {
                 serviceLoad[service->serviceName]++;
             }
         }
 
-        // Identify services with high load and suggest load balancing measures
         for (const auto& load : serviceLoad) {
             if (load.second > 10) {
                 cout << "Service " << load.first << " is highly loaded with " << load.second << " imports. Consider load balancing.\n";
@@ -902,7 +867,6 @@ public:
     void automateServiceUpdates() {
         unordered_map<string, int> latestVersions; 
         
-        // Iterate through each component and update its services to the latest versions
         for (auto& pair : components) {
             for (auto& service : pair.second.exports) {
                 if (latestVersions.find(service->serviceName) != latestVersions.end()) {
